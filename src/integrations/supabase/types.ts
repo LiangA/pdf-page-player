@@ -14,7 +14,147 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          client_id: string
+          consultant_id: string
+          created_at: string | null
+          end_time: string
+          google_calendar_event_id: string | null
+          google_meet_link: string | null
+          id: string
+          inquiry_id: string | null
+          start_time: string
+          status: Database["public"]["Enums"]["appointment_status"]
+        }
+        Insert: {
+          client_id: string
+          consultant_id: string
+          created_at?: string | null
+          end_time: string
+          google_calendar_event_id?: string | null
+          google_meet_link?: string | null
+          id?: string
+          inquiry_id?: string | null
+          start_time: string
+          status?: Database["public"]["Enums"]["appointment_status"]
+        }
+        Update: {
+          client_id?: string
+          consultant_id?: string
+          created_at?: string | null
+          end_time?: string
+          google_calendar_event_id?: string | null
+          google_meet_link?: string | null
+          id?: string
+          inquiry_id?: string | null
+          start_time?: string
+          status?: Database["public"]["Enums"]["appointment_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_consultant_id_fkey"
+            columns: ["consultant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_inquiry_id_fkey"
+            columns: ["inquiry_id"]
+            isOneToOne: true
+            referencedRelation: "inquiries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financial_needs_analysis: {
+        Row: {
+          client_id: string
+          fna_data: Json | null
+          id: string
+          last_updated: string | null
+        }
+        Insert: {
+          client_id: string
+          fna_data?: Json | null
+          id?: string
+          last_updated?: string | null
+        }
+        Update: {
+          client_id?: string
+          fna_data?: Json | null
+          id?: string
+          last_updated?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_needs_analysis_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inquiries: {
+        Row: {
+          created_at: string | null
+          form_data: Json
+          id: string
+          requested_time: string
+          status: Database["public"]["Enums"]["inquiry_status"]
+        }
+        Insert: {
+          created_at?: string | null
+          form_data: Json
+          id?: string
+          requested_time: string
+          status?: Database["public"]["Enums"]["inquiry_status"]
+        }
+        Update: {
+          created_at?: string | null
+          form_data?: Json
+          id?: string
+          requested_time?: string
+          status?: Database["public"]["Enums"]["inquiry_status"]
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          google_tokens: Json | null
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          google_tokens?: Json | null
+          id: string
+          role?: Database["public"]["Enums"]["user_role"]
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          google_tokens?: Json | null
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +163,12 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      appointment_status:
+        | "confirmed"
+        | "cancelled_by_client"
+        | "cancelled_by_consultant"
+      inquiry_status: "pending" | "claimed" | "invalid"
+      user_role: "client" | "consultant" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +295,14 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      appointment_status: [
+        "confirmed",
+        "cancelled_by_client",
+        "cancelled_by_consultant",
+      ],
+      inquiry_status: ["pending", "claimed", "invalid"],
+      user_role: ["client", "consultant", "admin"],
+    },
   },
 } as const
