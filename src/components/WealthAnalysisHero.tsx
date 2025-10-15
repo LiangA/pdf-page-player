@@ -1,13 +1,26 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface WealthAnalysisHeroProps {
   onStart: () => void;
 }
 
 export const WealthAnalysisHero = ({ onStart }: WealthAnalysisHeroProps) => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-secondary/5 to-background px-4">
+      <div className="absolute top-4 right-4">
+        <Button 
+          variant="outline" 
+          onClick={() => navigate("/login")}
+          className="gap-2"
+        >
+          <LogIn className="h-4 w-4" />
+          登入
+        </Button>
+      </div>
       <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in">
         <div className="space-y-4">
           <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
