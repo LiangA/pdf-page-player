@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Apply from "./pages/Apply";
 import Dashboard from "./pages/Dashboard";
 import ConsultantDashboard from "./pages/ConsultantDashboard";
 import NotFound from "./pages/NotFound";
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/apply" element={<Apply />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/consultant/dashboard" element={<ConsultantDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

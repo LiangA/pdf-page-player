@@ -1,6 +1,6 @@
 import { ArrowRight, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 interface WealthAnalysisHeroProps {
   onStart: () => void;
@@ -48,6 +48,14 @@ export const WealthAnalysisHero = ({ onStart }: WealthAnalysisHeroProps) => {
           >
             開始分析
             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+          </Button>
+          <Button 
+            size="lg"
+            variant="outline"
+            asChild
+            className="px-8 py-6 text-lg"
+          >
+            <Link to="/apply">新客戶申請</Link>
           </Button>
         </div>
 
