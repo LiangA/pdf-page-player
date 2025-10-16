@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,32 +8,39 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 
-const loginSchema = z.object({
-  email: z.string().trim().email({ message: "請輸入有效的電子郵件地址" }),
+const passwordSchema = z.object({
   password: z.string().min(6, { message: "密碼至少需要6個字符" }),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "密碼不匹配",
+  path: ["confirmPassword"],
 });
 
-const Login = () => {
+const ResetPassword = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Check if user is already logged in
+    // Check if user has a valid session (from password reset link)
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        redirectBasedOnRole(session.user.id);
+      if (!session) {
+        toast({
+          title: "無效的重設連結",
+          description: "請重新請求密碼重設",
+          variant: "destructive",
+        });
+        navigate("/forgot-password");
       }
     };
     checkSession();
-  }, []);
+  }, [navigate, toast]);
 
   const redirectBasedOnRole = async (userId: string) => {
     try {
-      // Check user roles from user_roles table (security best practice)
       const { data: roleData, error } = await supabase
         .from("user_roles")
         .select("role")
@@ -42,7 +49,6 @@ const Login = () => {
 
       if (error) throw error;
 
-      // If user has consultant or admin role, redirect to consultant dashboard
       if (roleData && roleData.length > 0) {
         navigate("/consultant/dashboard");
       } else {
@@ -50,20 +56,16 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Error fetching user role:", error);
-      toast({
-        title: "錯誤",
-        description: "無法獲取用戶資料，請稍後再試",
-        variant: "destructive",
-      });
+      navigate("/dashboard");
     }
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate inputs
+    // Validate passwords
     try {
-      loginSchema.parse({ email, password });
+      passwordSchema.parse({ password, confirmPassword });
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
@@ -78,27 +80,26 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
+      const { data, error } = await supabase.auth.updateUser({
+        password: password,
       });
 
       if (error) throw error;
 
+      toast({
+        title: "密碼已更新",
+        description: "您的密碼已成功更新，正在登入...",
+      });
+
+      // Redirect based on user role
       if (data.user) {
-        toast({
-          title: "登入成功",
-          description: "歡迎回來！",
-        });
         await redirectBasedOnRole(data.user.id);
       }
     } catch (error: any) {
-      console.error("Login error:", error);
+      console.error("Password update error:", error);
       toast({
-        title: "登入失敗",
-        description: error.message === "Invalid login credentials" 
-          ? "電子郵件或密碼錯誤，請檢查您的登入資訊"
-          : "登入時發生錯誤，請稍後再試",
+        title: "更新失敗",
+        description: "無法更新密碼，請稍後再試",
         variant: "destructive",
       });
     } finally {
@@ -110,27 +111,15 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-secondary/5 p-4">
       <Card className="w-full max-w-md shadow-large">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">登入</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">重設密碼</CardTitle>
           <CardDescription className="text-center">
-            輸入您的電子郵件和密碼以登入
+            輸入您的新密碼
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">電子郵件</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={isLoading}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">密碼</Label>
+              <Label htmlFor="password">新密碼</Label>
               <Input
                 id="password"
                 type="password"
@@ -141,18 +130,25 @@ const Login = () => {
                 disabled={isLoading}
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">確認新密碼</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                disabled={isLoading}
+              />
+            </div>
             <Button
               type="submit"
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? "登入中..." : "登入"}
+              {isLoading ? "更新中..." : "更新密碼"}
             </Button>
-            <div className="text-center text-sm">
-              <Link to="/forgot-password" className="text-primary hover:underline">
-                忘記密碼？
-              </Link>
-            </div>
           </form>
         </CardContent>
       </Card>
@@ -160,4 +156,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ResetPassword;
