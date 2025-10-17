@@ -111,11 +111,11 @@ const Dashboard = () => {
           <Card className="shadow-medium">
             <CardHeader>
               <CardTitle>財務需求分析</CardTitle>
-              <CardDescription>查看您的財務規劃</CardDescription>
+              <CardDescription>填寫或查看您的財務規劃</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" onClick={() => navigate("/")}>
-                開始分析
+              <Button className="w-full" onClick={() => navigate("/fna")}>
+                填寫 FNA 表單
               </Button>
             </CardContent>
           </Card>

@@ -9,8 +9,10 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Apply from "./pages/Apply";
 import Dashboard from "./pages/Dashboard";
+import FNA from "./pages/FNA";
 import ConsultantDashboard from "./pages/ConsultantDashboard";
 import ConsultantInquiries from "./pages/ConsultantInquiries";
+import ConsultantClientView from "./pages/ConsultantClientView";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,8 +30,10 @@ const App = () => (
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/apply" element={<Apply />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/fna" element={<FNA />} />
           <Route path="/consultant/dashboard" element={<ConsultantDashboard />} />
           <Route path="/consultant/inquiries" element={<ConsultantInquiries />} />
+          <Route path="/consultant/clients/:clientId" element={<ConsultantClientView />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const ConsultantDashboard = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const ConsultantDashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [clients, setClients] = useState<any[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -55,6 +57,23 @@ const ConsultantDashboard = () => {
       }
 
       setProfile(profileData);
+      
+      // Load clients with appointments
+      const { data: appointmentsData } = await supabase
+        .from("appointments")
+        .select(`
+          *,
+          client:profiles!appointments_client_id_fkey(*)
+        `)
+        .eq("consultant_id", session.user.id);
+
+      if (appointmentsData) {
+        const uniqueClients = Array.from(
+          new Map(appointmentsData.map((apt: any) => [apt.client.id, apt.client])).values()
+        );
+        setClients(uniqueClients);
+      }
+      
       setIsLoading(false);
     };
 
@@ -148,13 +167,42 @@ const ConsultantDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="shadow-medium">
+          <Card className="shadow-medium col-span-full">
             <CardHeader>
               <CardTitle>客戶管理</CardTitle>
-              <CardDescription>查看和管理您的客戶</CardDescription>
+              <CardDescription>查看和管理您的客戶 FNA 資料</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">暫無客戶資料</p>
+              {clients.length === 0 ? (
+                <p className="text-sm text-muted-foreground">暫無客戶資料</p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>客戶姓名</TableHead>
+                      <TableHead>電子郵件</TableHead>
+                      <TableHead className="text-right">操作</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {clients.map((client: any) => (
+                      <TableRow key={client.id}>
+                        <TableCell className="font-medium">{client.full_name || "未設定"}</TableCell>
+                        <TableCell>{client.email}</TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate(`/consultant/clients/${client.id}`)}
+                          >
+                            查看 FNA
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         </div>
