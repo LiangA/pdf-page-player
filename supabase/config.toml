@@ -2,3 +2,6 @@ project_id = "bduszdjbbdqcumnhjbze"
 
 [functions.submit-inquiry]
 verify_jwt = false
+
+[functions.accept-inquiry]
+verify_jwt = true

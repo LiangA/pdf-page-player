@@ -10,6 +10,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Apply from "./pages/Apply";
 import Dashboard from "./pages/Dashboard";
 import ConsultantDashboard from "./pages/ConsultantDashboard";
+import ConsultantInquiries from "./pages/ConsultantInquiries";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/apply" element={<Apply />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/consultant/dashboard" element={<ConsultantDashboard />} />
+          <Route path="/consultant/inquiries" element={<ConsultantInquiries />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -132,7 +132,9 @@ const ConsultantDashboard = () => {
               <CardDescription>查看客戶的諮詢請求</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">目前沒有待處理的諮詢</p>
+              <Button className="w-full" onClick={() => navigate("/consultant/inquiries")}>
+                查看諮詢申請
+              </Button>
             </CardContent>
           </Card>
 
